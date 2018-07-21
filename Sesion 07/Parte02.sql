@@ -76,3 +76,42 @@ inner join produccion.tbUbigeo u on e.idubigeo=u.id
 order by e.id
 FOR XML PATH('miemprendimiento'),--elemento con nombre
 root('emprendimientos')--padre de los padres
+
+--4 Uso de JSON AUTO
+--4.1
+select * from produccion.tbEmprendimiento
+FOR JSON AUTO,INCLUDE_NULL_VALUES
+--4.2
+select 
+e.razonsocial,
+ae.descripcion,
+u.departamento,
+u.provincia,
+u.distrito
+from produccion.tbEmprendimientoActividad ea
+inner join produccion.tbEmprendimiento e on ea.idemprendimiento=e.id
+inner join produccion.tbActividadEconomica ae on ea.ciiu=ae.ciiu
+inner join produccion.tbUbigeo u on e.idubigeo=u.id
+order by e.id
+FOR JSON AUTO,INCLUDE_NULL_VALUES,root('resultado')
+
+--5 Uso de JSON PATH
+select 
+e.razonsocial as [emprendimiento.razon],
+e.ruc as [emprendimiento.ruc],
+/*
+u.departamento as [emprendimiento.ubigeo.departamento],
+u.provincia as [emprendimiento.ubigeo.provincia],
+u.distrito as [emprendimiento.ubigeo.distrito],
+*/
+u.departamento as [ubigeo.departamento],
+u.provincia as [ubigeo.provincia],
+u.distrito as [ubigeo.distrito],
+ae.descripcion as [actividad.nombre]
+from produccion.tbEmprendimientoActividad ea
+inner join produccion.tbEmprendimiento e on ea.idemprendimiento=e.id
+inner join produccion.tbActividadEconomica ae on ea.ciiu=ae.ciiu
+inner join produccion.tbUbigeo u on e.idubigeo=u.id
+order by e.id
+FOR JSON PATH,
+WITHOUT_ARRAY_WRAPPER--Resultados sin corchetes.
